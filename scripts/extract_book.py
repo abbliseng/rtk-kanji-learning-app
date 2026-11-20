@@ -181,6 +181,37 @@ def apply_moves(frames: list[dict], to_check: list[dict]) -> None:
             to_check.append({"frame": f["frame"], "field": "story", "pdf": "missing in the PDF", "used": ""})
 
 
+# Corrections checked against the printed 6th edition (2026-11-20). Numbers only:
+# any corrected *text* from the book lives in private/corrections.json instead,
+# so it never ends up in this public repo.
+FRAME_SWAPS = [(230, 231)]  # the book has 230 昧 obscure, 231 末 extremity
+STROKE_FIXES = {1591: (13, 15), 1956: (10, 6)}  # frame: (count the ebook prints, the book's)
+CORRECTIONS = ROOT / "private" / "corrections.json"
+
+
+def apply_book_fixes(frames: list[dict]) -> None:
+    by_frame = {f["frame"]: f for f in frames}
+    keep = ("frame", "lesson")
+    for a, b in FRAME_SWAPS:
+        fa, fb = by_frame[a], by_frame[b]
+        for key in set(fa) | set(fb):
+            if key not in keep:
+                fa[key], fb[key] = fb.get(key), fa.get(key)
+        for f in (fa, fb):  # drop keys that only one side had
+            for key in [k for k, v in f.items() if v is None and k != "strokes"]:
+                del f[key]
+    for frame, (wrong, right) in STROKE_FIXES.items():
+        f = by_frame[frame]
+        f["story"] = f["story"].replace(f"[{wrong}]", f"[{right}]", 1)
+    if CORRECTIONS.exists():  # {"stories": {"509": "If the cushions ... [11]"}}
+        fixes = json.loads(CORRECTIONS.read_text(encoding="utf-8"))
+        for frame, story in fixes.get("stories", {}).items():
+            by_frame[int(frame)]["story"] = story
+    for f in frames:  # stroke count = the first [n] of the final story
+        counts = re.findall(r"\[(\d{1,2})\]", f["story"])
+        f["strokes"] = int(counts[0]) if counts else None
+
+
 def suspicious(frames: list[dict], ref: dict[int, dict]) -> list[int]:
     """Frames worth a look in the printed book: stroke count off by 2 or more, or the
     same story as the next frame."""
@@ -252,9 +283,10 @@ def main() -> None:
             if known.get("components"):
                 f["parts"] = [p.strip() for p in known["components"].split(";") if p.strip()]
         f["story"] = "\n\n".join(to_paragraphs(f.pop("_raw")))
-        strokes = re.findall(r"\[(\d{1,2})\]", f["story"])
-        f["strokes"] = int(strokes[0]) if strokes else None
     apply_moves(frames, to_check)
+    apply_book_fixes(frames)
+    has_story = {f["frame"] for f in frames if f["story"]}
+    to_check = [c for c in to_check if not (c["field"] == "story" and c["frame"] in has_story)]
     for p in primitives:
         p["text"] = "\n\n".join(to_paragraphs(p.pop("_raw")))
     intros = {n: "\n\n".join(to_paragraphs(v)) for n, v in intro_lines.items()}
