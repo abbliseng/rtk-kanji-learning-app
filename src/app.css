@@ -1,0 +1,153 @@
+:root {
+  --bg: #16161c;
+  --surface: #1f1f27;
+  --surface-2: #2a2a34;
+  --border: #34343f;
+  --text: #ecebf2;
+  --muted: #9b9aab;
+  --accent: #b9a6ff;
+  --accent-ink: #16161c;
+  --good: #7fd6a3;
+  --close: #e8c872;
+  --bad: #f08a8a;
+
+  /* Grid shades: a kanji brightens from gray to white as its stage rises. */
+  --shade-locked: 0.16;
+  --shade-apprentice: 0.38;
+  --shade-guru: 0.62;
+  --shade-master: 0.8;
+  --shade-enlightened: 0.92;
+  --shade-burned: 1;
+
+  --radius: 14px;
+  --radius-lg: 22px;
+  --bar-height: 64px;
+  --kanji-font: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  --kanji-sans: 'Hiragino Sans', 'Yu Gothic', 'Noto Sans JP', sans-serif;
+
+  color-scheme: dark;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+.btn {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn-quiet {
+  background: none;
+  border-color: transparent;
+  color: var(--muted);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 0.85rem;
+}
+
+.kanji {
+  font-family: var(--kanji-font);
+  font-weight: 600;
+  line-height: 1;
+}
+
+input[type='text'],
+input[type='number'],
+input[type='search'],
+textarea,
+select {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 16px; /* 16px keeps iOS from zooming in on focus */
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.banner {
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.story {
+  white-space: pre-line;
+  line-height: 1.5;
+}
+
+.story :global(p + p) {
+  margin-top: 0.6em;
+}

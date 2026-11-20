@@ -118,8 +118,8 @@ def to_paragraphs(raw: list[str]) -> list[str]:
         if not s or s in JUNK or RE_GLYPHS_ONLY.match(s):
             continue
         s = re.sub(rf"(\[\d{{1,2}}\])[{CJK}\s]+$", r"\1", s)  # stroke-order glyphs after the count
-        if cur and re.search(r"[a-z]-$", cur[-1]):
-            cur[-1] = cur[-1][:-1] + s  # re-join a word hyphenated at a line end
+        if cur and re.search(r"[A-Za-z]-$", cur[-1]):
+            cur[-1] = cur[-1] + s  # line ends in a hyphen: join without a space, keep the hyphen
         else:
             cur.append(s)
         if re.search(r"\[\d{1,2}\]$", s) or (len(s) < 45 and re.search(r"[.\]:?!”\"]$", s)):
