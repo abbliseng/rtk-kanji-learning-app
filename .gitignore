@@ -1,0 +1,7 @@
+# Copyrighted book material: never commit
+*.pdf
+private/
+
+node_modules/
+dist/
+.DS_Store
