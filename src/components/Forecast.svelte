@@ -103,7 +103,7 @@
 
   .hours {
     display: grid;
-    grid-template-columns: repeat(24, 1fr);
+    grid-template-columns: repeat(24, minmax(0, 1fr));
     align-items: end;
     gap: 2px;
   }
@@ -124,8 +124,11 @@
     opacity: 0.35;
   }
 
+  /* Fixed height, so hours with and without a label keep their bars on one baseline. */
   .tiny {
     font-size: 0.65rem;
-    min-height: 0.8em;
+    height: 1.3em;
+    line-height: 1.3em;
+    white-space: nowrap;
   }
 </style>
