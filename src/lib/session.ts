@@ -71,6 +71,25 @@ export function forecast(progress: Iterable<Progress>, now: number, days = 7): n
   return counts;
 }
 
+/**
+ * Reviews due in each hour (0–23) of the day `dayOffset` days from today.
+ * On today, everything already overdue counts in the current hour.
+ */
+export function hourlyForecast(progress: Iterable<Progress>, now: number, dayOffset: number): number[] {
+  const counts = new Array(24).fill(0);
+  const day = new Date(startOfDay(now));
+  day.setDate(day.getDate() + dayOffset);
+  const start = day.getTime();
+  day.setDate(day.getDate() + 1);
+  const end = day.getTime();
+  for (const p of progress) {
+    if (p.nextReview === null || p.stage <= 0 || p.stage >= BURNED) continue;
+    const at = dayOffset === 0 ? Math.max(p.nextReview, now) : p.nextReview;
+    if (at >= start && at < end) counts[new Date(at).getHours()]++;
+  }
+  return counts;
+}
+
 export function shuffle<T>(items: T[], random = Math.random): T[] {
   const a = [...items];
   for (let i = a.length - 1; i > 0; i--) {

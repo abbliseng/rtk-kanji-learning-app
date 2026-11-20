@@ -1,16 +1,14 @@
 <script lang="ts">
-  import { WEEKDAYS } from '../lib/format';
   import { byFrame, TOTAL } from '../lib/kanji';
-  import { dueFrames, forecast, lessonsLeftToday, startOfDay } from '../lib/session';
+  import { dueFrames, lessonsLeftToday, startOfDay } from '../lib/session';
   import { stageGroup, type StageGroup } from '../lib/srs';
   import { app, schedulerNow, setVacation, store } from '../lib/state.svelte';
   import { streak } from '../lib/stats';
+  import Forecast from './Forecast.svelte';
 
   const now = $derived(schedulerNow());
   const due = $derived(dueFrames(store.progress.values(), now));
   const lessons = $derived(lessonsLeftToday(store.progress, app.settings, due.length, TOTAL, app.now));
-  const days = $derived(forecast(store.progress.values(), now, 7));
-  const maxDay = $derived(Math.max(1, ...days));
   const todayKanji = $derived(
     [...store.progress.values()].filter((p) => p.unlockedAt >= startOfDay(app.now)).map((p) => p.frame).sort((a, b) => a - b)
   );
@@ -73,18 +71,7 @@
   </section>
 {/if}
 
-<section class="card">
-  <h2>Next 7 days</h2>
-  <div class="forecast">
-    {#each days as n, i (i)}
-      <div class="day">
-        <span class="n small">{n}</span>
-        <div class="bar" style="height: {(n / maxDay) * 64}px"></div>
-        <span class="muted small">{i === 0 ? 'Today' : WEEKDAYS[new Date(app.now + i * 86_400_000).getDay()]}</span>
-      </div>
-    {/each}
-  </div>
-</section>
+<Forecast />
 
 <section class="card">
   <h2>Progress</h2>
@@ -181,27 +168,6 @@
     border: none;
     padding: 2px;
     cursor: pointer;
-  }
-
-  .forecast {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    align-items: end;
-    gap: 6px;
-  }
-
-  .day {
-    display: grid;
-    justify-items: center;
-    gap: 4px;
-  }
-
-  .bar {
-    width: 100%;
-    min-height: 2px;
-    border-radius: 4px;
-    background: var(--accent);
-    opacity: 0.8;
   }
 
   .split {

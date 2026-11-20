@@ -5,6 +5,7 @@ import {
   DEFAULT_SETTINGS,
   dueFrames,
   forecast,
+  hourlyForecast,
   lessonsLeftToday,
   nextLessonFrames,
   pickDistractors,
@@ -52,6 +53,24 @@ describe('queues', () => {
   it('forecasts reviews by day, overdue counting as today', () => {
     const rows = [p(1, 1, NOW - 48 * HOUR), p(2, 2, NOW + 2 * HOUR), p(3, 4, startOfDay(NOW) + 30 * HOUR)];
     expect(forecast(rows, NOW, 3)).toEqual([2, 1, 0]);
+  });
+});
+
+describe('hourlyForecast', () => {
+  it('buckets one day by hour, overdue counting in the current hour today', () => {
+    const rows = [
+      p(1, 1, NOW - 48 * HOUR), // overdue -> now (12:00)
+      p(2, 2, NOW + 2 * HOUR + 60_000), // 14:01
+      p(3, 3, NOW + 24 * HOUR + 3 * HOUR), // tomorrow 15:00
+      p(4, 9, null)
+    ];
+    const today = hourlyForecast(rows, NOW, 0);
+    expect(today[12]).toBe(1);
+    expect(today[14]).toBe(1);
+    expect(today.reduce((a, b) => a + b)).toBe(2);
+    const tomorrow = hourlyForecast(rows, NOW, 1);
+    expect(tomorrow[15]).toBe(1);
+    expect(tomorrow.reduce((a, b) => a + b)).toBe(1);
   });
 });
 
